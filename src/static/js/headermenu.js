@@ -17,7 +17,11 @@ function fillHeader() {
 
         const userIcon = document.createElement('img');
         const currentURL = window.location.href.replace(/\/[^/]*$/, '/');
-        userIcon.src = currentURL + 'images/user.png';
+        if (currentURL === window.location.href) {
+            userIcon.src = 'images/user.png';
+        } else {
+            userIcon.src = '../images/user.png';
+        }
         userIcon.alt = 'User Icon';
 
         // Create a button to view claimed items

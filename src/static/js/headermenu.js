@@ -16,7 +16,7 @@ function fillHeader() {
         userContainer.classList.add('user-container'); // You can add your own class for styling
 
         const userIcon = document.createElement('img');
-        userIcon.src = 'path/to/user-icon.png'; // Set the path to your user icon
+        userIcon.src = 'images/user.png'; // Set the path to your user icon
         userIcon.alt = 'User Icon';
 
         // Create a button to view claimed items

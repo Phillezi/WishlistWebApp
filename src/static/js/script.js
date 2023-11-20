@@ -130,15 +130,23 @@ async function getShareURL() {
             const currentURL = window.location.href;
             const shareURL = `${currentURL}list/${data.urlext}`;
 
-            try {
-                await navigator.clipboard.writeText(shareURL);
-                alert('URL copied to clipboard: ' + shareURL);
-            } catch (err) {
-                console.error('Failed to copy URL to clipboard:', err);
+            const readOnlyInput = document.getElementById('readOnlyInput');
+            if (readOnlyInput) {
+                readOnlyInput.value = shareURL;
             }
         } else {
             alert(data.error || data.message);
         }
+    }
+}
+
+async function copyShareURL() {
+    const readOnlyInput = document.getElementById('readOnlyInput');
+    try {
+        await navigator.clipboard.writeText(readOnlyInput.value);
+        alert('URL copied to clipboard: ' + readOnlyInput.value);
+    } catch (err) {
+        console.error('Failed to copy URL to clipboard:', err);
     }
 }
 
@@ -155,3 +163,7 @@ function logoutUi() {
     document.getElementById('editSection').style.display = 'none';
     document.getElementById('logout-button').style.display = 'none';
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    getShareURL();
+});

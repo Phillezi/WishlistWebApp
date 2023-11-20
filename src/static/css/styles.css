@@ -159,3 +159,9 @@ img {
 #share {
     display: flex;
 }
+
+#copyshareurlbtn {
+    width: 33px;
+    height: 33px;
+    padding: 10px;
+}

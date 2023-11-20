@@ -87,11 +87,29 @@ const serveWishlistHtml = (res, base64data) => {
             <link rel="stylesheet" href="../css/styles.css">
         </head>
         <body>
+        <div id="login-form">
+            <h2>Login</h2>
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+            <button onclick="login()">Login</button>
+        </div>
+
+        <div id="register-form">
+            <h2>Register</h2>
+            <label for="register-username">Username:</label>
+            <input type="text" id="register-username" name="register-username" required>
+            <label for="register-password">Password:</label>
+            <input type="password" id="register-password" name="register-password" required>
+            <button onclick="register()">Register</button>
+        </div>
         <div id="wishlist">
         <ul id="wishlist-items"></ul>
         </div>
         </body>
         <script src="../js/getlist.js"></script>
+        <script src="../js/user.js"></script>
         </html>
     `;
 
@@ -240,7 +258,11 @@ app.post('api/item/remove', (req, res) => {
  * API endpoint to claim an item from a users wishlist.
  */
 app.post('api/item/claim', (req, res) => {
-    const { itemId, userId } = req.body;
+    const { itemId, userToken } = req.body;
+    const userId = base64UrlDecodeToNumber(userToken);
+    if (userId === null || isNaN(userId)) {
+        res.status(409).json({ error: 'Invalid user to claim from' });
+    }
     const claimedUserId = getUserIdFromAuthToken(req.headers.authorization);
     if (claimedUserId === null) {
         res.status(400).json({ message: 'Invalid token, try to login again' });

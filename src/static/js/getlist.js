@@ -1,3 +1,5 @@
+const updateUIEnabled = false;
+
 async function updateWishlist() {
     const token = getShareToken();
     if (token === null || token === '') {
@@ -47,6 +49,15 @@ async function updateWishlist() {
                     description.textContent = item.item_desc;
                     itemdiv.appendChild(description);
                 }
+
+                // Create a clickable button for each item
+                const claimButton = document.createElement('button');
+                claimButton.textContent = 'Claim';
+                claimButton.addEventListener('click', () => {
+                    claimItem(item.id);
+                });
+                itemdiv.appendChild(claimButton);
+
                 wishlistItemsElement.appendChild(itemdiv);
             });
         } else {
@@ -58,6 +69,29 @@ async function updateWishlist() {
 
 function getShareToken() {
     return document.getElementById('token').innerHTML;
+}
+
+async function claimItem(itemId) {
+    const token = getAuthToken();
+    if (token === null || token === '') {
+        alert('You need to be logged in to claim items');
+        return;
+    }
+    const response = await fetch('/api/item/claim', {
+        headers: {
+            Authorization: token,
+        },
+        body: {
+            itemId,
+            'userToken': getShareToken(),
+        }
+    });
+    if (response.ok) {
+        const data = await response.json();
+    } else {
+        alert(data.error || data.message);
+    }
+
 }
 
 document.addEventListener('DOMContentLoaded', function() {

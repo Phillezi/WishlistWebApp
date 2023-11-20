@@ -19,9 +19,9 @@
             <div id="login-form">
                 <h2>Login</h2>
                 <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required>
+                <input type="text" id="username" name="username" maxlength="255" required>
                 <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
+                <input type="password" id="password" name="password" maxlength="255" required>
                 <button onclick="login()">Login</button>
             </div>
 
@@ -39,8 +39,8 @@
             <div id="wishlist">
                 <h2>Your Wishlist</h2>
                 <ul id="wishlist-items"></ul>
-                <input type="text" id="item-name" name="item-name" placeholder="Name" required>
-                <input type="text" id="item-url" name="item-url" placeholder="Link">
+                <input type="text" id="item-name" name="item-name" placeholder="Name" maxlength="255" required>
+                <input type="text" id="item-url" name="item-url" placeholder="Link" maxlength="255">
                 <input type="text" id="item-description" name="item-description" placeholder="Description">
                 <button onclick="addItem()">Add to Wishlist</button>
             </div>

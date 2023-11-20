@@ -9,25 +9,29 @@
 </head>
 
 <body>
-    <div id="app">
+    <header></header>
+    <div id="container">
         <h1>Wishlist App</h1>
-        <div id="login-form">
-            <h2>Login</h2>
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-            <button onclick="login()">Login</button>
-        </div>
+        <section id="account-management">
+            <div id="login-form">
+                <h2>Login</h2>
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+                <button onclick="login()">Login</button>
+            </div>
 
-        <div id="register-form">
-            <h2>Register</h2>
-            <label for="register-username">Username:</label>
-            <input type="text" id="register-username" name="register-username" required>
-            <label for="register-password">Password:</label>
-            <input type="password" id="register-password" name="register-password" required>
-            <button onclick="register()">Register</button>
-        </div>
+            <div id="register-form">
+                <h2>Register</h2>
+                <label for="register-username">Username:</label>
+                <input type="text" id="register-username" name="register-username" required>
+                <label for="register-password">Password:</label>
+                <input type="password" id="register-password" name="register-password" required>
+                <button onclick="register()">Register</button>
+            </div>
+        </section>
+
         <section id="editSection" style="display: none;">
             <div id="wishlist">
                 <h2>Your Wishlist</h2>
@@ -39,11 +43,9 @@
             </div>
             <button onclick="getShareURL()">Get shareable url</button>
         </section>
-
-
-        <button onclick="logout()" id="logout-button" style="display: none;">Logout</button>
     </div>
     <script src="js/user.js"></script>
+    <script src="js/headermenu.js"></script>
     <script src="js/script.js"></script>
 </body>
 

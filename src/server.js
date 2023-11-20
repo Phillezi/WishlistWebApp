@@ -1,6 +1,7 @@
 const express = require('express');
 const mysql = require('mysql2');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 const config = require('./config/db');
 const secret = require('./config/secret');
 const app = express();
@@ -21,6 +22,27 @@ pool.getConnection((err, connection) => {
 
 app.use(express.static('static'));
 app.use(express.json());
+
+const saltRounds = 10; // The higher the number, the more secure, but also slower
+
+async function hashPassword(password) {
+    try {
+        const salt = await bcrypt.genSalt(saltRounds);
+        const hash = await bcrypt.hash(password, salt);
+        return hash;
+    } catch (error) {
+        throw error;
+    }
+}
+
+async function comparePassword(plainTextPassword, hashedPassword) {
+    try {
+        const match = await bcrypt.compare(plainTextPassword, hashedPassword);
+        return match;
+    } catch (error) {
+        throw error;
+    }
+}
 
 const base64UrlEncode = (str) => {
     return Buffer.from(str).toString('base64');
@@ -44,6 +66,9 @@ function getUserIdFromAuthToken(token) {
         const decoded = jwt.verify(token, secretKey);
         return decoded.userId;
     } catch (error) {
+        if (error === jwt.TokenExpiredError) {
+            return null;
+        }
         console.error('Error decoding JWT token:', error);
         return null;
     }
@@ -58,6 +83,18 @@ app.get('/api/token/verify', (req, res) => {
         res.status(400).json({ message: 'Invalid token, try to login again' });
     } else {
         res.status(200).json({ message: 'Valid token' });
+    }
+});
+
+/**
+ * API endpoint to get id from token.
+ */
+app.get('/api/token/id', (req, res) => {
+    const userId = getUserIdFromAuthToken(req.headers.authorization);
+    if (userId === null) {
+        res.status(400).json({ message: 'Invalid token, try to login again' });
+    } else {
+        res.status(200).json({ message: 'Valid token', userId });
     }
 });
 
@@ -87,29 +124,35 @@ const serveWishlistHtml = (res, base64data) => {
             <link rel="stylesheet" href="../css/styles.css">
         </head>
         <body>
-        <div id="login-form">
-            <h2>Login</h2>
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-            <button onclick="login()">Login</button>
-        </div>
-
-        <div id="register-form">
-            <h2>Register</h2>
-            <label for="register-username">Username:</label>
-            <input type="text" id="register-username" name="register-username" required>
-            <label for="register-password">Password:</label>
-            <input type="password" id="register-password" name="register-password" required>
-            <button onclick="register()">Register</button>
-        </div>
-        <div id="wishlist">
-        <ul id="wishlist-items"></ul>
+        <header></header>
+        <div id="container">
+            <h2 id="wishlistTitle"></h2>
+            <section id="account-management">
+                <div id="login-form">
+                    <h2>Login</h2>
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" required>
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                    <button onclick="login()">Login</button>
+                </div>
+                <div id="register-form">
+                    <h2>Register</h2>
+                    <label for="register-username">Username:</label>
+                    <input type="text" id="register-username" name="register-username" required>
+                    <label for="register-password">Password:</label>
+                    <input type="password" id="register-password" name="register-password" required>
+                    <button onclick="register()">Register</button>
+                </div>
+            </section>
+            <div id="wishlist">
+            <ul id="wishlist-items"></ul>
+            </div>
         </div>
         </body>
         <script src="../js/getlist.js"></script>
         <script src="../js/user.js"></script>
+        <script src="../js/headermenu.js"></script>
         </html>
     `;
 
@@ -134,6 +177,7 @@ app.get('/api/wishlist/get/view', (req, res) => {
     const userId = base64UrlDecodeToNumber(req.headers.authorization);
     if (userId === null || isNaN(userId)) {
         res.status(400).json({ message: 'Invalid token' });
+        return;
     }
     pool.query('SELECT * FROM wishlist_items WHERE user_id = ?', [userId], (err, results) => {
         if (err) {
@@ -150,21 +194,28 @@ app.get('/api/wishlist/get/view', (req, res) => {
  */
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
-    pool.query('SELECT user_id FROM users WHERE username = ? AND password = ?', [username, password], (err, results) => {
-        if (err) {
-            console.error('Error logging in:', err);
-            res.status(500).json({ error: 'Internal Server Error' });
-        }
-
-        if (results.length === 0) {
-            return res.status(401).json({ error: 'Invalid username or password' });
-        }
-
-        const userId = results[0].user_id;
-        const authToken = generateAuthToken(userId);
-        res.json({ token: authToken });
-    });
-
+    try {
+        pool.query('SELECT user_id, password FROM users WHERE username = ?', [username], async(err, results) => {
+            if (err) {
+                console.error('Error logging in:', err);
+                res.status(500).json({ error: 'Internal Server Error' });
+                return;
+            }
+            if (results.length === 0) {
+                return res.status(401).json({ error: 'Invalid username or password' });
+            }
+            if (await comparePassword(password, results[0].password)) {
+                const userId = results[0].user_id;
+                const authToken = generateAuthToken(userId);
+                res.json({ token: authToken });
+            } else {
+                return res.status(401).json({ error: 'Invalid username or password' });
+            }
+        });
+    } catch (error) {
+        console.error('Error hashing password:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
 
 });
 
@@ -174,22 +225,28 @@ app.post('/api/login', (req, res) => {
 app.post('/api/register', (req, res) => {
     const { username, password } = req.body;
 
-    pool.query('SELECT user_id FROM users WHERE username = ?', [username], (err, checkResults) => {
+    pool.query('SELECT user_id FROM users WHERE username = ?', [username], async(err, checkResults) => {
         if (err) {
             console.error('Error when checking if username is free:', err);
             return res.status(500).json({ error: 'Internal Server Error' });
         }
 
         if (checkResults.length === 0) {
-            pool.query('INSERT INTO users (username, password) VALUES (?, ?)', [username, password], (err, results) => {
-                if (err) {
-                    console.error('Error registering:', err);
-                    return res.status(500).json({ error: 'Internal Server Error' });
-                }
-                const userId = results.insertId;
-                const authToken = generateAuthToken(userId);
-                res.json({ token: authToken });
-            });
+            try {
+                const hashedPass = await hashPassword(password);
+                pool.query('INSERT INTO users (username, password) VALUES (?, ?)', [username, hashedPass], (err, results) => {
+                    if (err) {
+                        console.error('Error registering:', err);
+                        return res.status(500).json({ error: 'Internal Server Error' });
+                    }
+                    const userId = results.insertId;
+                    const authToken = generateAuthToken(userId);
+                    res.json({ token: authToken });
+                });
+            } catch (error) {
+                console.error('Error hashing password:', error);
+                res.status(500).json({ error: 'Internal Server Error' });
+            }
         } else {
             res.status(400).json({ message: 'Username already taken' });
         }
@@ -203,6 +260,7 @@ app.get('/api/wishlist/get', (req, res) => {
     const userId = getUserIdFromAuthToken(req.headers.authorization);
     if (userId === null) {
         res.status(400).json({ message: 'Invalid token, try to login again' });
+        return;
     }
     pool.query('SELECT * FROM wishlist_items WHERE user_id = ?', [userId], (err, results) => {
         if (err) {
@@ -222,6 +280,7 @@ app.post('/api/item/add', (req, res) => {
     const userId = getUserIdFromAuthToken(req.headers.authorization);
     if (userId === null) {
         res.status(400).json({ message: 'Invalid token, try to login again' });
+        return;
     }
 
     pool.query('INSERT INTO wishlist_items (user_id, item_name, item_url, item_desc) VALUES (?, ?, ?, ?)', [userId, itemName, itemUrl, itemDesc], (err, results) => {
@@ -237,11 +296,12 @@ app.post('/api/item/add', (req, res) => {
 /**
  * API endpoint to remove an item to the users wishlist.
  */
-app.post('api/item/remove', (req, res) => {
+app.post('/api/item/remove', (req, res) => {
     const { itemId } = req.body;
     const userId = getUserIdFromAuthToken(req.headers.authorization);
     if (userId === null) {
         res.status(400).json({ message: 'Invalid token, try to login again' });
+        return;
     }
 
     pool.query('DELETE FROM wishlist_items WHERE id = ? AND user_id = ?', [itemId, userId], (err, results) => {
@@ -255,17 +315,60 @@ app.post('api/item/remove', (req, res) => {
 });
 
 /**
+ * API endpoint to get the username of the users sharelink.
+ */
+app.post('/api/user/name/get', (req, res) => {
+    const { b64id } = req.body;
+    const userId = base64UrlDecodeToNumber(b64id);
+    if (userId === null || isNaN(userId)) {
+        res.status(409).json({ error: 'Invalid user' });
+        return;
+    }
+
+    pool.query('SELECT username FROM users WHERE user_id = ?', [userId], (err, results) => {
+        if (err) {
+            console.error('Error getting username:', err);
+            res.status(500).json({ error: 'Internal Server Error' });
+        } else {
+            res.status(200).json({ name: results[0].username });
+        }
+    });
+});
+
+/**
+ * API endpoint to get the users claimed items.
+ */
+app.get('/api/user/claimed', (req, res) => {
+    const userId = getUserIdFromAuthToken(req.headers.authorization);
+    if (userId === null) {
+        res.status(400).json({ message: 'Invalid token, try to login again' });
+        return;
+    }
+    pool.query('SELECT wi.item_name, wi.item_url, wi.item_desc, u.username FROM wishlist_items wi JOIN users u ON wi.claimed_by = u.user_id WHERE wi.claimed_by = ?', [userId], (err, results) => {
+        if (err) {
+            console.error('Error retrieving claimed by:', err);
+            res.status(500).json({ error: 'Internal Server Error' });
+        } else {
+            res.status(200).json({ results });
+        }
+    });
+});
+
+
+/**
  * API endpoint to claim an item from a users wishlist.
  */
-app.post('api/item/claim', (req, res) => {
-    const { itemId, userToken } = req.body;
-    const userId = base64UrlDecodeToNumber(userToken);
+app.post('/api/item/claim', (req, res) => {
+    const { itemId, b64id } = req.body;
+    const userId = base64UrlDecodeToNumber(b64id);
     if (userId === null || isNaN(userId)) {
         res.status(409).json({ error: 'Invalid user to claim from' });
+        return;
     }
     const claimedUserId = getUserIdFromAuthToken(req.headers.authorization);
     if (claimedUserId === null) {
         res.status(400).json({ message: 'Invalid token, try to login again' });
+        return;
     }
 
     pool.query('UPDATE wishlist_items SET claimed_by = ? WHERE user_id = ? AND id = ? AND claimed_by IS NULL', [claimedUserId, userId, itemId], (err, results) => {
@@ -283,14 +386,20 @@ app.post('api/item/claim', (req, res) => {
 /**
  * API endpoint to unclaim an item from a users wishlist.
  */
-app.post('api/item/unclaim', (req, res) => {
-    const { itemId, userId } = req.body;
+app.post('/api/item/unclaim', (req, res) => {
+    const { itemId, b64id } = req.body;
+    const userId = base64UrlDecodeToNumber(b64id);
+    if (userId === null || isNaN(userId)) {
+        res.status(409).json({ error: 'Invalid user to unclaim from' });
+        return;
+    }
     const claimedUserId = getUserIdFromAuthToken(req.headers.authorization);
     if (claimedUserId === null) {
         res.status(400).json({ message: 'Invalid token, try to login again' });
+        return;
     }
 
-    pool.query('UPDATE wishlist_items SET claimed_by = NULL WHERE user_id = ? AND id = ? AND claimed_by IS ?', [userId, itemId, claimedUserId], (err, results) => {
+    pool.query('UPDATE wishlist_items SET claimed_by = NULL WHERE user_id = ? AND id = ? AND claimed_by = ?', [userId, itemId, claimedUserId], (err, results) => {
         if (err) {
             console.error('Error unclaiming item from wishlist:', err);
             res.status(500).json({ error: 'Internal Server Error' });

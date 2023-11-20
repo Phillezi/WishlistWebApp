@@ -1,9 +1,7 @@
 async function validateToken() {
     const token = getAuthToken();
     if (token === null || token === '') {
-        if (updateUIEnabled) {
-            logoutUi();
-        }
+        logoutUi();
     } else {
         const response = await fetch('/api/token/verify', {
             headers: {
@@ -12,10 +10,8 @@ async function validateToken() {
         });
         const data = await response.json();
         if (response.ok) {
-            if (updateUIEnabled) {
-                loginUi();
-                updateWishlist();
-            }
+            loginUi();
+            updateWishlist();
         } else {
             console.log('Token has timed out, please log in again');
             logout();
@@ -79,20 +75,6 @@ function logout() {
 function getAuthToken() {
     const token = localStorage.getItem('token');
     return token;
-}
-
-function loginUi() {
-    document.getElementById('login-form').style.display = 'none';
-    document.getElementById('register-form').style.display = 'none';
-    document.getElementById('editSection').style.display = 'block';
-    document.getElementById('logout-button').style.display = 'block';
-}
-
-function logoutUi() {
-    document.getElementById('login-form').style.display = 'block';
-    document.getElementById('register-form').style.display = 'block';
-    document.getElementById('editSection').style.display = 'none';
-    document.getElementById('logout-button').style.display = 'none';
 }
 
 document.addEventListener('DOMContentLoaded', function() {

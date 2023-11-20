@@ -6,7 +6,7 @@ body {
     padding: 0;
 }
 
-#app {
+#container {
     max-width: 800px;
     margin: auto;
     padding: 20px;
@@ -119,4 +119,39 @@ button:hover {
 #wishlist-items .item-desc {
     color: #555;
     margin-top: 5px;
+}
+
+.removebtn {
+    background-color: #d45252;
+}
+
+.removebtn:hover {
+    background-color: #d32f2f;
+}
+
+#account-management {
+    display: flex;
+    justify-content: center;
+}
+
+header {
+    background-color: #333;
+    color: white;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.user-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+img {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-right: 10px;
 }

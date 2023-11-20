@@ -13,6 +13,7 @@
     "dependencies": {
         "express": "*",
         "mysql2": "*",
-        "jsonwebtoken": "*"
+        "jsonwebtoken": "*",
+        "bcrypt": "*"
     }
 }

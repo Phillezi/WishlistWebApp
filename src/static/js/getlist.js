@@ -1,9 +1,23 @@
-const updateUIEnabled = false;
-
 async function updateWishlist() {
+    const myToken = getAuthToken();
+    let myId = null;
+    if (myToken !== null || myToken !== '') {
+        const response = await fetch('/api/token/id', {
+            headers: {
+                Authorization: myToken, // Use myToken here instead of token
+            },
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            myId = data.userId;
+        } else {
+            console.error('Error fetching user ID:', response.status);
+        }
+    }
     const token = getShareToken();
     if (token === null || token === '') {
-        alert('Not logged in');
+        alert('no token');
     } else {
         const response = await fetch('/api/wishlist/get/view', {
             headers: {
@@ -50,13 +64,22 @@ async function updateWishlist() {
                     itemdiv.appendChild(description);
                 }
 
-                // Create a clickable button for each item
-                const claimButton = document.createElement('button');
-                claimButton.textContent = 'Claim';
-                claimButton.addEventListener('click', () => {
-                    claimItem(item.id);
-                });
-                itemdiv.appendChild(claimButton);
+                if (item.claimed_by == null) {
+                    const claimButton = document.createElement('button');
+                    claimButton.textContent = 'Claim';
+                    claimButton.addEventListener('click', () => {
+                        claimItem(item.id);
+                    });
+                    itemdiv.appendChild(claimButton);
+                } else if (item.claimed_by === myId) {
+                    const claimButton = document.createElement('button');
+                    claimButton.classList.add('removebtn');
+                    claimButton.textContent = 'Unclaim';
+                    claimButton.addEventListener('click', () => {
+                        unClaimItem(item.id);
+                    });
+                    itemdiv.appendChild(claimButton);
+                }
 
                 wishlistItemsElement.appendChild(itemdiv);
             });
@@ -73,27 +96,90 @@ function getShareToken() {
 
 async function claimItem(itemId) {
     const token = getAuthToken();
+    const b64id = getShareToken();
     if (token === null || token === '') {
         alert('You need to be logged in to claim items');
         return;
     }
     const response = await fetch('/api/item/claim', {
+        method: 'POST',
         headers: {
+            'Content-Type': 'application/json',
             Authorization: token,
         },
-        body: {
-            itemId,
-            'userToken': getShareToken(),
-        }
+        body: JSON.stringify({ itemId, b64id }),
     });
+    const data = await response.json();
     if (response.ok) {
-        const data = await response.json();
+        updateWishlist();
     } else {
         alert(data.error || data.message);
     }
 
 }
 
+async function unClaimItem(itemId) {
+    const token = getAuthToken();
+    const b64id = getShareToken();
+    if (token === null || token === '') {
+        alert('You need to be logged in to claim items');
+        return;
+    }
+    const response = await fetch('/api/item/unclaim', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: token,
+        },
+        body: JSON.stringify({ itemId, b64id }),
+    });
+    const data = await response.json();
+    if (response.ok) {
+        updateWishlist();
+    } else {
+        alert(data.error || data.message);
+    }
+
+}
+
+async function getUsername() {
+    const b64id = getShareToken();
+    const response = await fetch('/api/user/name/get', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ b64id }),
+    });
+    const data = await response.json();
+    if (response.ok) {
+        const text = data.name + 's wishlist';
+        const usernameElement = document.getElementById('wishlistTitle');
+        if (usernameElement) {
+            // Set the retrieved username as the content of the HTML element
+            usernameElement.textContent = text;
+        } else {
+            console.error('wishlistTitle element not found');
+        }
+    } else {
+        alert(data.error || data.message);
+    }
+}
+
+function loginUi() {
+    document.getElementById('login-form').style.display = 'none';
+    document.getElementById('register-form').style.display = 'none';
+    document.getElementById('wishlist').style.display = 'block';
+    document.getElementById('logout-button').style.display = 'block';
+}
+
+function logoutUi() {
+    document.getElementById('login-form').style.display = 'block';
+    document.getElementById('register-form').style.display = 'block';
+    document.getElementById('logout-button').style.display = 'none';
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    getUsername();
     updateWishlist();
 });

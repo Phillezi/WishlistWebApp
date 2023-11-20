@@ -47,6 +47,13 @@ async function updateWishlist() {
                     description.textContent = item.item_desc;
                     itemdiv.appendChild(description);
                 }
+                const removebtn = document.createElement('button');
+                removebtn.classList.add('removebtn');
+                removebtn.textContent = 'Remove';
+                removebtn.addEventListener('click', () => {
+                    removeItem(item.id);
+                });
+                itemdiv.appendChild(removebtn);
                 wishlistItemsElement.appendChild(itemdiv);
             });
         } else {
@@ -84,6 +91,30 @@ async function addItem() {
     }
 }
 
+async function removeItem(itemId) {
+    const token = getAuthToken();
+    if (token === null || token === '') {
+        alert('Not logged in');
+    } else {
+        const response = await fetch('/api/item/remove', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: token,
+            },
+            body: JSON.stringify({ itemId }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            updateWishlist();
+        } else {
+            alert(data.error || data.message);
+        }
+    }
+}
+
 async function getShareURL() {
     const token = getAuthToken();
     if (token === null || token === '') {
@@ -96,9 +127,31 @@ async function getShareURL() {
         });
         if (response.ok) {
             const data = await response.json();
-            console.log(data.urlext);
+            const currentURL = window.location.href;
+            const shareURL = `${currentURL}list/${data.urlext}`;
+
+            try {
+                await navigator.clipboard.writeText(shareURL);
+                alert('URL copied to clipboard: ' + shareURL);
+            } catch (err) {
+                console.error('Failed to copy URL to clipboard:', err);
+            }
         } else {
             alert(data.error || data.message);
         }
     }
+}
+
+function loginUi() {
+    document.getElementById('login-form').style.display = 'none';
+    document.getElementById('register-form').style.display = 'none';
+    document.getElementById('editSection').style.display = 'block';
+    document.getElementById('logout-button').style.display = 'block';
+}
+
+function logoutUi() {
+    document.getElementById('login-form').style.display = 'block';
+    document.getElementById('register-form').style.display = 'block';
+    document.getElementById('editSection').style.display = 'none';
+    document.getElementById('logout-button').style.display = 'none';
 }

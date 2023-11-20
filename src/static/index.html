@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wishlist App</title>
-    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 
 <body>
@@ -28,19 +28,23 @@
             <input type="password" id="register-password" name="register-password" required>
             <button onclick="register()">Register</button>
         </div>
+        <section id="editSection" style="display: none;">
+            <div id="wishlist">
+                <h2>Your Wishlist</h2>
+                <ul id="wishlist-items"></ul>
+                <input type="text" id="item-name" name="item-name" placeholder="Name" required>
+                <input type="text" id="item-url" name="item-url" placeholder="Link">
+                <input type="text" id="item-description" name="item-description" placeholder="Description">
+                <button onclick="addItem()">Add to Wishlist</button>
+            </div>
+            <button onclick="getShareURL()">Get shareable url</button>
+        </section>
 
-        <div id="wishlist" style="display: none;">
-            <h2>Your Wishlist</h2>
-            <ul id="wishlist-items"></ul>
-            <label for="item-name">Item Name:</label>
-            <input type="text" id="item-name" name="item-name" required>
-            <button onclick="addItem()">Add to Wishlist</button>
-        </div>
 
         <button onclick="logout()" id="logout-button" style="display: none;">Logout</button>
     </div>
 
-    <script src="../js/script.js"></script>
+    <script src="js/script.js"></script>
 </body>
 
 </html>

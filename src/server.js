@@ -22,6 +22,19 @@ pool.getConnection((err, connection) => {
 app.use(express.static('static'));
 app.use(express.json());
 
+const base64UrlEncode = (str) => {
+    return Buffer.from(str).toString('base64');
+};
+
+const base64UrlDecode = (str) => {
+    return Buffer.from(str, 'base64').toString('utf-8');
+};
+
+const base64UrlDecodeToNumber = (str) => {
+    const decodedString = base64UrlDecode(str);
+    return Number(decodedString);
+};
+
 function generateAuthToken(userId) {
     return jwt.sign({ userId }, secretKey, { expiresIn: '1h' });
 }
@@ -37,6 +50,84 @@ function getUserIdFromAuthToken(token) {
 }
 
 /**
+ * API endpoint to verify a token.
+ */
+app.get('/api/token/verify', (req, res) => {
+    const userId = getUserIdFromAuthToken(req.headers.authorization);
+    if (userId === null) {
+        res.status(400).json({ message: 'Invalid token, try to login again' });
+    } else {
+        res.status(200).json({ message: 'Valid token' });
+    }
+});
+
+/**
+ * API endpoint to get url to share token.
+ */
+app.get('/api/url/get', (req, res) => {
+    const userId = getUserIdFromAuthToken(req.headers.authorization);
+    if (userId === null) {
+        res.status(400).json({ message: 'Invalid token, try to login again' });
+    } else {
+        const encodedUserId = base64UrlEncode(String(userId));
+        res.status(200).json({ 'urlext': encodedUserId });
+    }
+});
+
+
+const serveWishlistHtml = (res, base64data) => {
+    const html = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <div id="token" style="display: none;">${base64data}</div>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Wishlist</title>
+            <link rel="stylesheet" href="../css/styles.css">
+        </head>
+        <body>
+        <div id="wishlist">
+        <ul id="wishlist-items"></ul>
+        </div>
+        </body>
+        <script src="../js/getlist.js"></script>
+        </html>
+    `;
+
+    res.send(html);
+};
+
+/**
+ * User list share link.
+ */
+app.get('/list/:encodedUserId', (req, res) => {
+    const encodedUserId = req.params.encodedUserId;
+    const userId = base64UrlDecodeToNumber(encodedUserId);
+
+    if (userId === null || isNaN(userId)) {
+        res.status(400).json({ message: 'Invalid user ID' });
+    } else {
+        serveWishlistHtml(res, encodedUserId);
+    }
+});
+
+app.get('/api/wishlist/get/view', (req, res) => {
+    const userId = base64UrlDecodeToNumber(req.headers.authorization);
+    if (userId === null || isNaN(userId)) {
+        res.status(400).json({ message: 'Invalid token' });
+    }
+    pool.query('SELECT * FROM wishlist_items WHERE user_id = ?', [userId], (err, results) => {
+        if (err) {
+            console.error('Error retrieving wishlist:', err);
+            res.status(500).json({ error: 'Internal Server Error' });
+        } else {
+            res.status(200).json({ wishlist: results });
+        }
+    });
+});
+
+/**
  * API endpoint to login a user.
  */
 app.post('/api/login', (req, res) => {
@@ -46,9 +137,17 @@ app.post('/api/login', (req, res) => {
             console.error('Error logging in:', err);
             res.status(500).json({ error: 'Internal Server Error' });
         }
+
+        if (results.length === 0) {
+            return res.status(401).json({ error: 'Invalid username or password' });
+        }
+
+        const userId = results[0].user_id;
+        const authToken = generateAuthToken(userId);
+        res.json({ token: authToken });
     });
-    const authToken = generateAuthToken(results[0].userId);
-    res.json({ token: authToken });
+
+
 });
 
 /**
@@ -84,7 +183,7 @@ app.post('/api/register', (req, res) => {
  */
 app.get('/api/wishlist/get', (req, res) => {
     const userId = getUserIdFromAuthToken(req.headers.authorization);
-    if (userId === NULL) {
+    if (userId === null) {
         res.status(400).json({ message: 'Invalid token, try to login again' });
     }
     pool.query('SELECT * FROM wishlist_items WHERE user_id = ?', [userId], (err, results) => {
@@ -101,13 +200,13 @@ app.get('/api/wishlist/get', (req, res) => {
  * API endpoint to add an item to the users wishlist.
  */
 app.post('/api/item/add', (req, res) => {
-    const { itemName } = req.body;
+    const { itemName, itemUrl, itemDesc } = req.body;
     const userId = getUserIdFromAuthToken(req.headers.authorization);
-    if (userId === NULL) {
+    if (userId === null) {
         res.status(400).json({ message: 'Invalid token, try to login again' });
     }
 
-    pool.query('INSERT INTO wishlist_items (user_id, item_name) VALUES (?, ?)', [userId, itemName], (err, results) => {
+    pool.query('INSERT INTO wishlist_items (user_id, item_name, item_url, item_desc) VALUES (?, ?, ?, ?)', [userId, itemName, itemUrl, itemDesc], (err, results) => {
         if (err) {
             console.error('Error adding item to wishlist:', err);
             res.status(500).json({ error: 'Internal Server Error' });
@@ -123,7 +222,7 @@ app.post('/api/item/add', (req, res) => {
 app.post('api/item/remove', (req, res) => {
     const { itemId } = req.body;
     const userId = getUserIdFromAuthToken(req.headers.authorization);
-    if (userId === NULL) {
+    if (userId === null) {
         res.status(400).json({ message: 'Invalid token, try to login again' });
     }
 
@@ -143,7 +242,7 @@ app.post('api/item/remove', (req, res) => {
 app.post('api/item/claim', (req, res) => {
     const { itemId, userId } = req.body;
     const claimedUserId = getUserIdFromAuthToken(req.headers.authorization);
-    if (claimedUserId === NULL) {
+    if (claimedUserId === null) {
         res.status(400).json({ message: 'Invalid token, try to login again' });
     }
 
@@ -165,7 +264,7 @@ app.post('api/item/claim', (req, res) => {
 app.post('api/item/unclaim', (req, res) => {
     const { itemId, userId } = req.body;
     const claimedUserId = getUserIdFromAuthToken(req.headers.authorization);
-    if (claimedUserId === NULL) {
+    if (claimedUserId === null) {
         res.status(400).json({ message: 'Invalid token, try to login again' });
     }
 

@@ -1,19 +1,122 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Arial', sans-serif;
+    background-color: #f8f8f8;
+    /* Light gray background color */
+    margin: 0;
+    padding: 0;
 }
 
 #app {
-    max-width: 600px;
+    max-width: 800px;
     margin: auto;
     padding: 20px;
+    background-color: #fff;
+    /* White background color for the app container */
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    /* Subtle box shadow for a card-like appearance */
+}
+
+h1 {
+    color: #333;
+}
+
+h2 {
+    color: #444;
 }
 
 #login-form,
-#register-form {
+#register-form,
+#wishlist {
     margin-bottom: 20px;
 }
 
+label {
+    display: block;
+    margin-bottom: 5px;
+    color: #555;
+    /* Dark gray text color for labels */
+}
+
+input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 15px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    /* Light gray border for input fields */
+    border-radius: 5px;
+}
+
 button {
-    margin-top: 10px;
     cursor: pointer;
+    background-color: #4caf50;
+    /* Green color for buttons */
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+#logout-button {
+    background-color: #f44336;
+    /* Red color for logout button */
+}
+
+#logout-button:hover {
+    background-color: #d32f2f;
+}
+
+#item-name,
+#item-url,
+#item-description {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    /* Light gray border for input fields */
+    border-radius: 5px;
+}
+
+#wishlist-items {
+    padding: 0;
+}
+
+#wishlist-items li {
+    list-style: none;
+    margin-bottom: 10px;
+}
+
+#wishlist-items .item {
+    border: 1px solid #ddd;
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+#wishlist-items .item-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+}
+
+#wishlist-items .item-url {
+    color: #0066cc;
+    text-decoration: none;
+    display: block;
+    margin-bottom: 5px;
+}
+
+#wishlist-items .item-url:hover {
+    text-decoration: underline;
+}
+
+#wishlist-items .item-desc {
+    color: #555;
+    margin-top: 5px;
 }

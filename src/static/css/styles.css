@@ -1,0 +1,19 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+#app {
+    max-width: 600px;
+    margin: auto;
+    padding: 20px;
+}
+
+#login-form,
+#register-form {
+    margin-bottom: 20px;
+}
+
+button {
+    margin-top: 10px;
+    cursor: pointer;
+}

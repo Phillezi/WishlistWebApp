@@ -347,7 +347,7 @@ app.get('/api/user/claimed', (req, res) => {
         res.status(400).json({ message: 'Invalid token, try to login again' });
         return;
     }
-    pool.query('SELECT wi.item_name, wi.item_url, wi.item_desc, u.username FROM wishlist_items wi JOIN users u ON wi.claimed_by = u.user_id WHERE wi.claimed_by = ?', [userId], (err, results) => {
+    pool.query('SELECT wi.item_name, wi.item_url, wi.item_desc, u.username FROM wishlist_items wi JOIN users u ON wi.user_id = u.user_id WHERE wi.claimed_by = ?', [userId], (err, results) => {
         if (err) {
             console.error('Error retrieving claimed by:', err);
             res.status(500).json({ error: 'Internal Server Error' });

@@ -186,6 +186,9 @@ app.get('/api/wishlist/get/view', (req, res) => {
             console.error('Error retrieving wishlist:', err);
             res.status(500).json({ error: 'Internal Server Error' });
         } else {
+            results.forEach(item => {
+                item.claimed_by = item.claimed_by != null ? true : null;
+            });
             res.status(200).json({ wishlist: results });
         }
     });
@@ -271,7 +274,7 @@ app.get('/api/wishlist/get', (req, res) => {
         res.status(400).json({ message: 'Invalid token, try to login again' });
         return;
     }
-    pool.query('SELECT * FROM wishlist_items WHERE user_id = ?', [userId], (err, results) => {
+    pool.query('SELECT id, item_name, item_url, item_desc FROM wishlist_items WHERE user_id = ?', [userId], (err, results) => {
         if (err) {
             console.error('Error retrieving wishlist:', err);
             res.status(500).json({ error: 'Internal Server Error' });

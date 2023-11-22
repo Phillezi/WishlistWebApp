@@ -191,8 +191,9 @@ app.get('/api/wishlist/get/view', (req, res) => {
                 if (item.claimed_by != null) {
                     if (item.claimed_by === userId) {
                         item.claimed_by = 'you';
+                    } else {
+                        item.claimed_by = true;
                     }
-                    item.claimed_by = true;
                 }
             });
             res.status(200).json({ wishlist: results });

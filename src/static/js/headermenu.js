@@ -39,7 +39,7 @@ function fillHeader() {
 
         header.appendChild(navContainer);
         header.appendChild(userContainer);
-        //userContainer.style.display = 'none';
+        userContainer.style.display = 'none';
     } else {
         console.error('Header element not found');
     }

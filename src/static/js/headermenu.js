@@ -39,7 +39,7 @@ function fillHeader() {
 
         header.appendChild(navContainer);
         header.appendChild(userContainer);
-        userContainer.style.display = 'none';
+        //userContainer.style.display = 'none';
     } else {
         console.error('Header element not found');
     }
@@ -77,16 +77,20 @@ async function onViewItemsClick() {
 
 function showUserContainer() {
     var userContainers = document.getElementsByClassName('user-container');
-    userContainers.array.forEach(element => {
-        element.style.display = 'flex';
-    });
+    if (userContainers) {
+        userContainers.array.forEach(element => {
+            element.style.display = 'flex';
+        });
+    }
 }
 
 function hideUserContainer() {
     var userContainers = document.getElementsByClassName('user-container');
-    userContainers.array.forEach(element => {
-        element.style.display = 'none';
-    });
+    if (userContainers) {
+        userContainers.array.forEach(element => {
+            element.style.display = 'none';
+        });
+    }
 }
 
 window.addEventListener('load', fillHeader);

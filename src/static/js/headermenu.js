@@ -76,17 +76,17 @@ async function onViewItemsClick() {
 }
 
 function showUserContainer() {
-    var userContainer = document.getElementById('user-container');
-    if (userContainer) {
-        userContainer.style.display = 'flex';
-    }
+    var userContainers = document.getElementsByClassName('user-container');
+    userContainers.array.forEach(element => {
+        element.style.display = 'flex';
+    });
 }
 
 function hideUserContainer() {
-    var userContainer = document.getElementById('user-container');
-    if (userContainer) {
-        userContainer.style.display = 'none';
-    }
+    var userContainers = document.getElementsByClassName('user-container');
+    userContainers.array.forEach(element => {
+        element.style.display = 'none';
+    });
 }
 
 window.addEventListener('load', fillHeader);

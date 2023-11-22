@@ -1,9 +1,7 @@
-const updateUIEnabled = true;
-
 async function updateWishlist() {
     const token = getAuthToken();
     if (token === null || token === '') {
-        alert('Not logged in');
+        //alert('Not logged in');
     } else {
         const response = await fetch('/api/wishlist/get', {
             headers: {

@@ -166,6 +166,21 @@ async function getUsername() {
     }
 }
 
+function updateFavicon() {
+    var protocolAndDomain = window.location.href.split('/').slice(0, 3).join('/');
+    var faviconUrl = protocolAndDomain + '/icons/favicon.ico';
+    var newFavicon = document.createElement('link');
+    newFavicon.rel = 'icon';
+    newFavicon.type = 'image/x-icon';
+    newFavicon.href = faviconUrl;
+    var existingFavicon = document.querySelector('link[rel="icon"]');
+    if (existingFavicon) {
+        document.head.removeChild(existingFavicon);
+    }
+
+    document.head.appendChild(newFavicon);
+}
+
 function loginUi() {
     document.getElementById('login-form').style.display = 'none';
     document.getElementById('register-form').style.display = 'none';
@@ -182,6 +197,7 @@ function logoutUi() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    updateFavicon();
     getUsername();
     updateWishlist();
 });

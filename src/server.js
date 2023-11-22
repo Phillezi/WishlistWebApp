@@ -195,7 +195,7 @@ app.get('/api/wishlist/get/view', (req, res) => {
  * API endpoint to login a user.
  */
 app.post('/api/login', (req, res) => {
-    const { username, password } = req.body;
+    var { username, password } = req.body;
 
     username = username.replace(/[\s\t\n]/g, '').toLowerCase().replace(/^\w/, (c) => c.toUpperCase());
     password = password.replace(/[\s\t\n]/g, '');
@@ -229,7 +229,7 @@ app.post('/api/login', (req, res) => {
  * API endpoint to register a user.
  */
 app.post('/api/register', (req, res) => {
-    const { username, password } = req.body;
+    var { username, password } = req.body;
 
     username = username.replace(/[\s\t\n]/g, '').toLowerCase().replace(/^\w/, (c) => c.toUpperCase());
     password = password.replace(/[\s\t\n]/g, '');

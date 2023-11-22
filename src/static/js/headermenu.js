@@ -4,16 +4,16 @@ function fillHeader() {
     if (header) {
         const navContainer = document.createElement('div');
         navContainer.classList.add('nav-container');
-        // Create a home button
+
         const homeButton = document.createElement('button');
         homeButton.textContent = 'Home';
         homeButton.addEventListener('click', () => {
-            window.location.href = '/'; // Redirect to the home page
+            window.location.href = '/';
         });
         navContainer.appendChild(homeButton);
 
         const userContainer = document.createElement('div');
-        userContainer.classList.add('user-container'); // You can add your own class for styling
+        userContainer.classList.add('user-container');
 
         const userIcon = document.createElement('img');
         const currentURL = window.location.href.replace(/\/[^/]*$/, '/');
@@ -24,19 +24,16 @@ function fillHeader() {
         }
         userIcon.alt = 'User Icon';
 
-        // Create a button to view claimed items
         const viewItemsButton = document.createElement('button');
         viewItemsButton.textContent = 'View Claimed Items';
-        viewItemsButton.addEventListener('click', onViewItemsClick); // Define onViewItemsClick function
+        viewItemsButton.addEventListener('click', onViewItemsClick);
 
-        // Create a logout button
         const logoutButton = document.createElement('button');
         logoutButton.textContent = 'Logout';
-        logoutButton.addEventListener('click', logout); // Define onLogoutClick function
+        logoutButton.addEventListener('click', logout);
         logoutButton.id = "logout-button";
         logoutButton.style.display = "none";
 
-        // Append elements to the user container
         userContainer.appendChild(userIcon);
         userContainer.appendChild(viewItemsButton);
         userContainer.appendChild(logoutButton);
@@ -78,8 +75,18 @@ async function onViewItemsClick() {
     }
 }
 
-async function getUsernameFromId(userId) {
+function showUserContainer() {
+    var userContainer = document.getElementById('user-container');
+    if (userContainer) {
+        userContainer.style.display = 'flex';
+    }
+}
 
+function hideUserContainer() {
+    var userContainer = document.getElementById('user-container');
+    if (userContainer) {
+        userContainer.style.display = 'none';
+    }
 }
 
 window.addEventListener('load', fillHeader);

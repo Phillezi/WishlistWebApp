@@ -171,12 +171,14 @@ function loginUi() {
     document.getElementById('register-form').style.display = 'none';
     document.getElementById('wishlist').style.display = 'block';
     document.getElementById('logout-button').style.display = 'block';
+    showUserContainer();
 }
 
 function logoutUi() {
     document.getElementById('login-form').style.display = 'block';
     document.getElementById('register-form').style.display = 'block';
     document.getElementById('logout-button').style.display = 'none';
+    hideUserContainer();
 }
 
 document.addEventListener('DOMContentLoaded', function() {

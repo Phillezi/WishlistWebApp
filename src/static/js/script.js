@@ -156,6 +156,7 @@ function loginUi() {
     document.getElementById('register-form').style.display = 'none';
     document.getElementById('editSection').style.display = 'block';
     document.getElementById('logout-button').style.display = 'block';
+    showUserContainer();
 }
 
 function logoutUi() {
@@ -163,6 +164,7 @@ function logoutUi() {
     document.getElementById('register-form').style.display = 'block';
     document.getElementById('editSection').style.display = 'none';
     document.getElementById('logout-button').style.display = 'none';
+    hideUserContainer();
 }
 
 document.addEventListener('DOMContentLoaded', function() {

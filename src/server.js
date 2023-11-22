@@ -176,18 +176,24 @@ app.get('/list/:encodedUserId', (req, res) => {
 });
 
 app.get('/api/wishlist/get/view', (req, res) => {
-    const userId = base64UrlDecodeToNumber(req.headers.authorization);
-    if (userId === null || isNaN(userId)) {
+    const userId = getUserIdFromAuthToken(req.headers.authorization);
+    const viewUserId = base64UrlDecodeToNumber(req.headers.ViewUser);
+    if (userId === null || isNaN(userId) || viewUserId === null || isNaN(viewUserId)) {
         res.status(400).json({ message: 'Invalid token' });
         return;
     }
-    pool.query('SELECT * FROM wishlist_items WHERE user_id = ?', [userId], (err, results) => {
+    pool.query('SELECT * FROM wishlist_items WHERE user_id = ?', [viewUserId], (err, results) => {
         if (err) {
             console.error('Error retrieving wishlist:', err);
             res.status(500).json({ error: 'Internal Server Error' });
         } else {
             results.forEach(item => {
-                item.claimed_by = item.claimed_by != null ? true : null;
+                if (item.claimed_by != null) {
+                    if (item.claimed_by === userId) {
+                        item.claimed_by = 'you';
+                    }
+                    item.claimed_by = true;
+                }
             });
             res.status(200).json({ wishlist: results });
         }

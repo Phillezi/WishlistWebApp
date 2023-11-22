@@ -4,7 +4,7 @@ async function updateWishlist() {
     if (myToken !== null || myToken !== '') {
         const response = await fetch('/api/token/id', {
             headers: {
-                Authorization: myToken, // Use myToken here instead of token
+                Authorization: myToken,
             },
         });
 
@@ -15,13 +15,14 @@ async function updateWishlist() {
             console.error('Error fetching user ID:', response.status);
         }
     }
-    const token = getShareToken();
-    if (token === null || token === '') {
+    const viewToken = getShareToken();
+    if (viewToken === null || token === '') {
         alert('no token');
     } else {
         const response = await fetch('/api/wishlist/get/view', {
             headers: {
-                Authorization: token,
+                Authorization: myToken,
+                ViewUser: viewToken,
             },
         });
 
@@ -71,7 +72,7 @@ async function updateWishlist() {
                         claimItem(item.id);
                     });
                     itemdiv.appendChild(claimButton);
-                } else if (item.claimed_by === myId) {
+                } else if (item.claimed_by === 'you') {
                     const claimButton = document.createElement('button');
                     claimButton.classList.add('removebtn');
                     claimButton.textContent = 'Unclaim';

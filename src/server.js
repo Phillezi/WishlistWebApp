@@ -177,7 +177,7 @@ app.get('/list/:encodedUserId', (req, res) => {
 
 app.get('/api/wishlist/get/view', (req, res) => {
     const userId = getUserIdFromAuthToken(req.headers.authorization);
-    const viewUserId = base64UrlDecodeToNumber(req.headers.ViewUser);
+    const viewUserId = base64UrlDecodeToNumber(req.headers.viewuser);
     if (userId === null || isNaN(userId) || viewUserId === null || isNaN(viewUserId)) {
         res.status(400).json({ message: 'Invalid token' });
         return;

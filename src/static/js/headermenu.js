@@ -32,7 +32,6 @@ function fillHeader() {
         logoutButton.textContent = 'Logout';
         logoutButton.addEventListener('click', logout);
         logoutButton.id = "logout-button";
-        logoutButton.style.display = "none";
 
         userContainer.appendChild(userIcon);
         userContainer.appendChild(viewItemsButton);
@@ -40,6 +39,7 @@ function fillHeader() {
 
         header.appendChild(navContainer);
         header.appendChild(userContainer);
+        userContainer.style.display = 'none';
     } else {
         console.error('Header element not found');
     }

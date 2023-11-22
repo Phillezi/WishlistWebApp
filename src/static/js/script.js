@@ -116,7 +116,7 @@ async function removeItem(itemId) {
 async function getShareURL() {
     const token = getAuthToken();
     if (token === null || token === '') {
-        alert('Not logged in');
+        //alert('Not logged in');
     } else {
         const response = await fetch('/api/url/get', {
             headers: {

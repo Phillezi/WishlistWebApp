@@ -174,8 +174,8 @@ function updateFavicon() {
     newFavicon.type = 'image/x-icon';
     newFavicon.href = faviconUrl;
     var existingFavicon = document.querySelector('link[rel="icon"]');
-    if (existingFavicon) {
-        document.head.removeChild(existingFavicon);
+    if (existingFavicon && existingFavicon.parentNode) {
+        existingFavicon.parentNode.removeChild(existingFavicon);
     }
 
     document.head.appendChild(newFavicon);

@@ -78,7 +78,7 @@ async function onViewItemsClick() {
 function showUserContainer() {
     var userContainers = document.getElementsByClassName('user-container');
     if (userContainers) {
-        userContainers.array.forEach(element => {
+        userContainers.forEach(function(element) {
             element.style.display = 'flex';
         });
     }
@@ -87,7 +87,7 @@ function showUserContainer() {
 function hideUserContainer() {
     var userContainers = document.getElementsByClassName('user-container');
     if (userContainers) {
-        userContainers.array.forEach(element => {
+        userContainers.forEach(function(element) {
             element.style.display = 'none';
         });
     }

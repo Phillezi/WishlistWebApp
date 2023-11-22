@@ -18,18 +18,18 @@
             <div id="login-form">
                 <h2>Login</h2>
                 <label for="username">Username:</label>
-                <input type="text" id="username" name="username" maxlength="255" required pattern="^[^\s\t]*$">
+                <input type="text" id="username" name="username" maxlength="255" required oninput="validateUsername(this)">
                 <label for="password">Password:</label>
-                <input type="password" id="password" name="password" maxlength="255" required pattern="^[^\s\t]*$">
+                <input type="password" id="password" name="password" maxlength="255" required oninput="validateUsername(this)">
                 <button onclick="login()">Login</button>
             </div>
 
             <div id="register-form">
                 <h2>Register</h2>
                 <label for="register-username">Username:</label>
-                <input type="text" id="register-username" name="register-username" required pattern="^[^\s\t]*$">
+                <input type="text" id="register-username" name="register-username" required oninput="validateUsername(this)">
                 <label for="register-password">Password:</label>
-                <input type="password" id="register-password" name="register-password" required pattern="^[^\s\t]*$">
+                <input type="password" id="register-password" name="register-password" required oninput="validateUsername(this)">
                 <button onclick="register()">Register</button>
             </div>
         </section>

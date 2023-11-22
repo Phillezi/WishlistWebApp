@@ -78,18 +78,20 @@ async function onViewItemsClick() {
 function showUserContainer() {
     var userContainers = document.getElementsByClassName('user-container');
     if (userContainers) {
-        userContainers.forEach(function(element) {
+        userContainers.style.display = 'flex';
+        /*userContainers.forEach(function(element) {
             element.style.display = 'flex';
-        });
+        });*/
     }
 }
 
 function hideUserContainer() {
     var userContainers = document.getElementsByClassName('user-container');
     if (userContainers) {
-        userContainers.forEach(function(element) {
+        userContainers.style.display = 'none';
+        /*userContainers.forEach(function(element) {
             element.style.display = 'none';
-        });
+        });*/
     }
 }
 

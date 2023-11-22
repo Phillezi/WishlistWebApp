@@ -80,7 +80,6 @@ function getAuthToken() {
 function validateUsername(input) {
     var value = input.value;
     if (/\s/.test(value)) {
-        alert("Spaces are not allowed in the username.");
         input.value = value.replace(/\s/g, '');
     }
 }

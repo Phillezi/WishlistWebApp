@@ -111,7 +111,6 @@ app.get('/api/url/get', (req, res) => {
     }
 });
 
-
 const serveWishlistHtml = (res, base64data) => {
     const html = `
         <!DOCTYPE html>
@@ -134,17 +133,17 @@ const serveWishlistHtml = (res, base64data) => {
                 <div id="login-form">
                     <h2>Login</h2>
                     <label for="username">Username:</label>
-                    <input type="text" id="username" name="username" required>
+                    <input type="text" id="username" name="username" required oninput="validateUsername(this)">
                     <label for="password">Password:</label>
-                    <input type="password" id="password" name="password" required>
+                    <input type="password" id="password" name="password" required oninput="validateUsername(this)">
                     <button onclick="login()">Login</button>
                 </div>
                 <div id="register-form">
                     <h2>Register</h2>
                     <label for="register-username">Username:</label>
-                    <input type="text" id="register-username" name="register-username" required>
+                    <input type="text" id="register-username" name="register-username" required oninput="validateUsername(this)">
                     <label for="register-password">Password:</label>
-                    <input type="password" id="register-password" name="register-password" required>
+                    <input type="password" id="register-password" name="register-password" required oninput="validateUsername(this)">
                     <button onclick="register()">Register</button>
                 </div>
             </section>
@@ -197,6 +196,10 @@ app.get('/api/wishlist/get/view', (req, res) => {
  */
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
+
+    username = username.replace(/[\s\t\n]/g, '').toLowerCase().replace(/^\w/, (c) => c.toUpperCase());
+    password = password.replace(/[\s\t\n]/g, '');
+
     try {
         pool.query('SELECT user_id, password FROM users WHERE username = ?', [username], async(err, results) => {
             if (err) {
@@ -227,6 +230,9 @@ app.post('/api/login', (req, res) => {
  */
 app.post('/api/register', (req, res) => {
     const { username, password } = req.body;
+
+    username = username.replace(/[\s\t\n]/g, '').toLowerCase().replace(/^\w/, (c) => c.toUpperCase());
+    password = password.replace(/[\s\t\n]/g, '');
 
     pool.query('SELECT user_id FROM users WHERE username = ?', [username], async(err, checkResults) => {
         if (err) {

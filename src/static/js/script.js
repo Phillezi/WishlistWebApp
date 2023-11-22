@@ -151,6 +151,7 @@ async function copyShareURL() {
 }
 
 function loginUi() {
+    getShareURL();
     document.getElementById('login-form').style.display = 'none';
     document.getElementById('register-form').style.display = 'none';
     document.getElementById('editSection').style.display = 'block';

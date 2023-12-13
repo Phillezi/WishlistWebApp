@@ -32,9 +32,12 @@ This is a simple web application designed to facilitate the sharing and claiming
    ```
 
 3. Configure the database:
-   - Update database connection details in `src/config/dbConfig.js`.
+   - Update database connection details in `src/config/db.js`.
+   
+4. Configure the jwt secret:
+   - Update the jwt secret in `src/config/secret.js`.
 
-4. Start the application:
+5. Start the application:
    ```bash
    npm start
    ```

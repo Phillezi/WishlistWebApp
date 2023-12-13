@@ -210,6 +210,10 @@ app.post('/api/login', (req, res) => {
     username = username.replace(/[\s\t\n]/g, '').toLowerCase().replace(/^\w/, (c) => c.toUpperCase());
     password = password.replace(/[\s\t\n]/g, '');
 
+    if (username.length == 0 || password.length == 0) {
+        return res.status(401).json({ error: 'Invalid username or password' });
+    }
+
     try {
         pool.query('SELECT user_id, password FROM users WHERE username = ?', [username], async(err, results) => {
             if (err) {

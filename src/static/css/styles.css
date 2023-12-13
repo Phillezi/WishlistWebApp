@@ -81,6 +81,7 @@ button:hover {
 
 #wishlist-items li {
     list-style: none;
+    overflow: hidden;
     margin-bottom: 10px;
 }
 

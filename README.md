@@ -22,12 +22,12 @@ This is a simple web application designed to facilitate the sharing and claiming
 ### Installation
 1. Clone the repository:
    ```bash
-   git clone https://github.com/Phillezi/wishlistWebApp.git
+   git clone https://github.com/Phillezi/WishlistWebApp.git
    ```
 
 2. Install dependencies:
    ```bash
-   cd wishlistWebApp/src
+   cd WishlistWebApp/src
    npm install
    ```
 

@@ -1,5 +1,6 @@
 # Wishlist App
 This is a simple web application designed to facilitate the sharing and claiming of wishlists among users.
+![image](https://github.com/Phillezi/WishlistWebApp/assets/112874974/55afc72e-60aa-47db-b70e-cce1554c5f7b)
 
 ## Features
 - **Gift Claiming:** Other users can claim items from wishlists, ensuring no duplicate gifts.
